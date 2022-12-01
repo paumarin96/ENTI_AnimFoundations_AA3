@@ -13,6 +13,7 @@ public class MovingBall : MonoBehaviour
     private float _movementSpeed = 5f;
 
     Vector3 _dir;
+    public Transform target;
 
     // Start is called before the first frame update
     void Start()
@@ -30,9 +31,8 @@ public class MovingBall : MonoBehaviour
         //get the Input from Vertical axis
         float verticalInput = Input.GetAxis("Vertical");
 
-        //update the position
-        transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
-
+        //update the direction
+        _dir = (target.position - transform.position).normalized;
     }
 
     private void OnCollisionEnter(Collision collision)

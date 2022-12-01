@@ -17,6 +17,7 @@ public class IK_tentacles : MonoBehaviour
 
     MyOctopusController _myController = new MyOctopusController();
     
+    
 
 
     [Header("Exercise 3")]
@@ -36,7 +37,7 @@ public class IK_tentacles : MonoBehaviour
     bool _updateTwistSwingLimits = false;
 
 
-
+    private int _shootCount = 1;
 
     [SerializeField]
     float TwistMin{set{ _myController.TwistMin = value; }}
@@ -54,7 +55,11 @@ public class IK_tentacles : MonoBehaviour
 
     public void NotifyShoot()
     {
-        _myController.NotifyShoot();
+        
+        if(_shootCount % 2 == 0)
+         _myController.NotifyShoot();
+
+        _shootCount++;
     }
 
 

@@ -26,6 +26,8 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legTargets;
     public Transform[] futureLegBases;
 
+    public ShootForce shootForce;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -44,11 +46,17 @@ public class IK_Scorpion : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            shootForce.StartForceSlider();
+        }
+        
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            shootForce.StopForceSlider();
             NotifyStartWalk();
             animTime = 0;
             animPlaying = true;
         }
-
+        
         if (animTime < animDuration)
         {
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
