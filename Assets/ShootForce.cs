@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 public class ShootForce : MonoBehaviour
 {
@@ -11,10 +12,10 @@ public class ShootForce : MonoBehaviour
     
     private int _direction  = 1;
     private bool _startSlider = false;
-    void Start()
-    {
-            
-    }
+
+    public  delegate void Shoot(float force);
+
+    public static event Shoot OnShoot;
 
     public void StartForceSlider()
     {
@@ -24,6 +25,8 @@ public class ShootForce : MonoBehaviour
     public void StopForceSlider()
     {
         _startSlider = false;
+        if (OnShoot != null)
+            OnShoot(slider.value);
     }
 
     // Update is called once per frame

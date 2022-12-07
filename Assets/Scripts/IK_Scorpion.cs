@@ -27,6 +27,10 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] futureLegBases;
 
     public ShootForce shootForce;
+
+    public delegate void StartWalk();
+
+    public event StartWalk OnStartWalk;
     
     // Start is called before the first frame update
     void Start()
@@ -52,6 +56,7 @@ public class IK_Scorpion : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             shootForce.StopForceSlider();
+            
             NotifyStartWalk();
             animTime = 0;
             animPlaying = true;
@@ -79,7 +84,8 @@ public class IK_Scorpion : MonoBehaviour
     //Trigger Function to start the walk animation
     public void NotifyStartWalk()
     {
-
+        if(OnStartWalk != null)
+            OnStartWalk();
         _myController.NotifyStartWalk();
     }
 }
