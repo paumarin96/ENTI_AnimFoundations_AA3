@@ -37,7 +37,7 @@ public class IK_tentacles : MonoBehaviour
     bool _updateTwistSwingLimits = false;
 
 
-    private int _shootCount = 1;
+    private int _shootCount = 0;
 
     [SerializeField]
     float TwistMin{set{ _myController.TwistMin = value; }}
@@ -56,10 +56,11 @@ public class IK_tentacles : MonoBehaviour
     public void NotifyShoot()
     {
         
-        if(_shootCount % 2 == 0)
-         _myController.NotifyShoot();
-
         _shootCount++;
+        if(_shootCount % 2 == 0)
+             _myController.NotifyShoot();
+
+
     }
 
 

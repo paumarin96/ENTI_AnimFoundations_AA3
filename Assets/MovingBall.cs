@@ -24,17 +24,19 @@ public class MovingBall : MonoBehaviour
     Vector3 _dir;
     public Transform target;
     private Transform _initialTransform;
+    private bool _shooted;
 
     private void OnEnable()
     {
         ShootForce.OnShoot += GetShootForce;
-        _scorpion.OnStartWalk += ResetBall;
+        _scorpion.OnStartWalk += ResetShootedFlag;
     }
 
     private void OnDisable()
     {
         ShootForce.OnShoot -= GetShootForce;
-        _scorpion.OnStartWalk -= ResetBall;
+        _scorpion.OnStartWalk -= ResetShootedFlag;
+
     }
 
     // Start is called before the first frame update
@@ -43,13 +45,7 @@ public class MovingBall : MonoBehaviour
         _initialTransform = transform;
     }
 
-    void ResetBall()
-    {
-        Debug.Log("Cum");
-        transform.position = _initialTransform.position;
-        transform.rotation = _initialTransform.rotation;
-        transform.localScale = _initialTransform.localScale;
-    }
+
     void GetShootForce(float force)
     {
         _force = force;
@@ -70,7 +66,17 @@ public class MovingBall : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        _myOctopus.NotifyShoot();
-        _shootingPhysics.Shoot(_force);
+        if (!_shooted)
+        {
+            _myOctopus.NotifyShoot();
+            _shootingPhysics.Shoot(_force);
+            _shooted = true;
+        }
+
+    }
+
+    private void ResetShootedFlag()
+    {
+        _shooted = false;
     }
 }

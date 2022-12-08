@@ -13,7 +13,7 @@ public class ShootingPhysics : MonoBehaviour
     public const float acceleration = -9.81f;
     private float totalAnimationTime;
     private float timer = 0.0f;
-    private Transform _startTransform;
+    private Vector3 _startPosition;
     
     private bool _shoot;
     private Vector3 finalPos;
@@ -31,17 +31,16 @@ public class ShootingPhysics : MonoBehaviour
 
     private void Start()
     {
-        _startTransform = transform;
+        _startPosition = transform.position;
     }
 
     void ResetTimer()
     {       
-        Debug.Log("Cum2");
+        
         _shoot = false;
         timer = 0.0f;
-        transform.position = _startTransform.position;
+        transform.position = _startPosition;
      
-       
         initialPos = transform.position;
     }
     public void Shoot(float force)
@@ -49,14 +48,13 @@ public class ShootingPhysics : MonoBehaviour
         totalAnimationTime = force.Remap(0, 100, maxTime, minTime);
         
         _shoot = true;
-        initialPos = _startTransform.position;
+        initialPos = _startPosition;
 
         //find initial velocity
         initialVel.x = (target.position.x - initialPos.x) / totalAnimationTime;
         initialVel.y = ((target.position.y - initialPos.y) - (0.5f * acceleration * totalAnimationTime * totalAnimationTime)) / totalAnimationTime ;
         initialVel.z = (target.position.z - initialPos.z) / totalAnimationTime;
 
-        Debug.Log(initialVel);
     }
 
     void Update()
@@ -67,7 +65,10 @@ public class ShootingPhysics : MonoBehaviour
         timer += Time.deltaTime;
 
         if (timer >= totalAnimationTime)
-            _shoot = false;
+        {
+            ResetTimer();
+        }
+            
 
         finalPos.x = initialPos.x + initialVel.x * timer;
         finalPos.y = initialPos.y + initialVel.y * timer + (acceleration * timer * timer)/2;
