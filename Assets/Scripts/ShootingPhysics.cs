@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -25,18 +26,20 @@ public class ShootingPhysics : MonoBehaviour
     private Vector3 eulerOldVel;
     private Vector3 eulerAccel;
     private Vector3 eulerForces;
-
+    Vector3 upForce;
+    [SerializeField] private MagnusEffectSlider _magnusSlider;
+    
     private Vector3 w;
     [SerializeField] private float mass = 1;
 
 
     public void OnEnable()
     {
-        Scorpion.OnStartWalk += ResetTimer;
+        Scorpion.OnStartWalk += ResetBall;
     }
     public void OnDisable()
     {
-        Scorpion.OnStartWalk -= ResetTimer;
+        Scorpion.OnStartWalk -= ResetBall;
     }
 
     private void Start()
@@ -44,7 +47,7 @@ public class ShootingPhysics : MonoBehaviour
         _startPosition = transform.position;
     }
 
-    void ResetTimer()
+    void ResetBall()
     {       
         
         _shoot = false;
@@ -55,28 +58,22 @@ public class ShootingPhysics : MonoBehaviour
     }
     public void Shoot(float force)
     {
-        totalAnimationTime = force.Remap(0, 100, maxTime, minTime);
+        force = force.Remap(0, 100, 0, 10);
         
         _shoot = true;
         initialPos = _startPosition;
 
-        //find initial velocity
-        initialVel.x = (target.position.x - initialPos.x) / totalAnimationTime;
-        initialVel.y = ((target.position.y - initialPos.y) - (0.5f * acceleration * totalAnimationTime * totalAnimationTime)) / totalAnimationTime ;
-        initialVel.z = (target.position.z - initialPos.z) / totalAnimationTime;
+        var magnusForceMultiplier = _magnusSlider.value;
         
+        var torque = Vector3.Cross(ball.right * -0.5f, magnusForceMultiplier * (target.position - initialPos).normalized);
+        w = torque;
 
-        
-        var torque = Vector3.Cross(ball.position + ball.right * -0.5f, 1 * (target.position - initialPos).normalized);
-        w = Time.deltaTime * (torque / (2.0f / 5.0f * mass * (0.5f * 0.5f))); 
-        Debug.Log(w);
-       
-        
+        upForce = Vector3.up * Mathf.Lerp(0.0f, 15.0f, magnusForceMultiplier);
 
         initialVel = target.position - initialPos;
-        eulerOldVel = Vector3.forward;//initialVel * 2;
-        
-        Debug.Log(w);
+        eulerOldVel = initialVel * 0.5f * force;
+
+        StartCoroutine(ResetTimer());
 
     }
 
@@ -98,9 +95,10 @@ public class ShootingPhysics : MonoBehaviour
         // finalPos.z = initialPos.z + initialVel.z * timer;
 
         Vector3 magnusForce = 2.0f * (Vector3.Cross(w, eulerOldVel));
-        //Debug.Log(magnusForce);
+        
+        Debug.Log(magnusForce);
         //Vector3 targetForce = (target.position - initialPos) * 10;
-        eulerForces = magnusForce;// + Vector3.down * (2 * 9.81f);
+        eulerForces = magnusForce + upForce + Vector3.down * (0.5f * 9.81f);
         eulerAccel = eulerForces / 1.0f;
 
         Vector3 eulerVel = eulerOldVel + eulerAccel * Time.deltaTime;
@@ -113,6 +111,12 @@ public class ShootingPhysics : MonoBehaviour
 
     }
 
+    private IEnumerator ResetTimer()
+    {
+        yield return new WaitForSeconds(3.0f);
+        ResetBall();
+
+    }
     private void OnDrawGizmos()
     {
         float step = 100 / totalAnimationTime;
