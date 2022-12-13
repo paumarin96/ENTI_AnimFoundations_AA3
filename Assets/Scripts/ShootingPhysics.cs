@@ -62,10 +62,14 @@ public class ShootingPhysics : MonoBehaviour
         
         _shoot = true;
         initialPos = _startPosition;
-
+        var direction = (target.position - initialPos).normalized;
         var magnusForceMultiplier = _magnusSlider.value;
-        
-        var torque = Vector3.Cross(ball.right * -0.5f, magnusForceMultiplier * (target.position - initialPos).normalized);
+        var side = Vector3.Dot(direction, Vector3.right) < 0 ? 1 : -1;
+
+        Vector3 point = new Vector3(side * Mathf.Sin(magnusForceMultiplier *  Mathf.PI/2),
+            0, -Mathf.Cos(magnusForceMultiplier * Mathf.PI/2));
+        Debug.Log(point);
+        var torque = Vector3.Cross(point * 0.5f, magnusForceMultiplier * direction);
         w = torque;
 
         upForce = Vector3.up * Mathf.Lerp(0.0f, 15.0f, magnusForceMultiplier);
@@ -96,7 +100,6 @@ public class ShootingPhysics : MonoBehaviour
 
         Vector3 magnusForce = 2.0f * (Vector3.Cross(w, eulerOldVel));
         
-        Debug.Log(magnusForce);
         //Vector3 targetForce = (target.position - initialPos) * 10;
         eulerForces = magnusForce + upForce + Vector3.down * (0.5f * 9.81f);
         eulerAccel = eulerForces / 1.0f;
