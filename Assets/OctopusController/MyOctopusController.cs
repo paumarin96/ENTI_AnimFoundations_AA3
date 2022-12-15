@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 
 namespace OctopusController
@@ -137,7 +139,7 @@ namespace OctopusController
                 if (goToBall && i == nearestTentacle)
                 {
                     
-                    update_ccd(i, _target.transform.position);
+                    update_ccd(i, Vector3.Lerp(_tentacles[i].Bones[_tentacles[i].Bones.Length - 1].transform.position,_target.transform.position, Time.deltaTime * 20f));
                 }
                 else
                 {
@@ -157,6 +159,28 @@ namespace OctopusController
 
 
         #region private and internal methods
+        
+        private Quaternion ClampRotation(Quaternion q)
+        {
+            q.x /= q.w;
+            q.y /= q.w;
+            q.z /= q.w;
+            q.w = 1.0f;
+ 
+            float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan(q.x);
+            angleX = Mathf.Clamp(angleX, -20, 20);
+            q.x = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleX);
+            
+            float angleY = 2.0f * Mathf.Rad2Deg * Mathf.Atan(q.y);
+            angleY = 0;
+            q.y = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleY);
+            
+            float angleZ = 2.0f * Mathf.Rad2Deg * Mathf.Atan(q.z);
+            angleZ = Mathf.Clamp(angleZ, -2, 2);
+            q.z = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleZ);
+ 
+            return q;
+        }
 
         void update_ccd(int tentacleIndex, Vector3 target) {
 
@@ -202,20 +226,16 @@ namespace OctopusController
                             _theta[i] = -_theta[i];
                         
                        var finalRotQuat =  Quaternion.AngleAxis(_theta[i], axis) * joints[i].transform.rotation;
-                       var finalRotQuatTwist = new Quaternion(0, finalRotQuat.y, 0, finalRotQuat.w).normalized;
-                       var finalRotQuatSwing = finalRotQuat * Quaternion.Inverse(finalRotQuatTwist);
+                       
 
-                       var twistAngle = 0.0f;
-                       Vector3 twistAxis;
-                           finalRotQuatSwing.ToAngleAxis(out twistAngle, out twistAxis);
-                           twistAngle = Mathf.Clamp(twistAngle, _twistMin, _twistMax);
+                       joints[i].transform.rotation = finalRotQuat; 
+                       
+                       var finalRotQuatTwist = new Quaternion(0, joints[i].transform.localRotation.y, 0, joints[i].transform.localRotation.w).normalized;
+                       var finalRotQuatSwing = Quaternion.Inverse(finalRotQuatTwist) * joints[i].transform.localRotation;
+                       finalRotQuatSwing.Normalize();
+                       var QuatSwingClamped = ClampRotation(finalRotQuatSwing);
 
-                           finalRotQuatSwing = Quaternion.AngleAxis(twistAngle, twistAxis);
-                           
-
-
-
-                       joints[i].transform.rotation = finalRotQuatSwing;
+                       joints[i].transform.localRotation = QuatSwingClamped;
 
                     }
 

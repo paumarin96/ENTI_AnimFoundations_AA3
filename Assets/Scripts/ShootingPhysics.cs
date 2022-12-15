@@ -68,7 +68,7 @@ public class ShootingPhysics : MonoBehaviour
 
         Vector3 point = new Vector3(side * Mathf.Sin(magnusForceMultiplier *  Mathf.PI/2),
             0, -Mathf.Cos(magnusForceMultiplier * Mathf.PI/2));
-        Debug.Log(point);
+     
         var torque = Vector3.Cross(point * 0.5f, magnusForceMultiplier * direction);
         w = torque;
 
