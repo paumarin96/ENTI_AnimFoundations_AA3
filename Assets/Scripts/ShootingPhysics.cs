@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Net.Security;
 using System.Runtime.CompilerServices;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -64,10 +65,8 @@ public class ShootingPhysics : MonoBehaviour
         initialPos = _startPosition;
         var direction = (target.position - initialPos).normalized;
         var magnusForceMultiplier = _magnusSlider.value;
-        var side = Vector3.Dot(direction, Vector3.right) < 0 ? 1 : -1;
 
-        Vector3 point = new Vector3(side * Mathf.Sin(magnusForceMultiplier *  Mathf.PI/2),
-            0, -Mathf.Cos(magnusForceMultiplier * Mathf.PI/2));
+        Vector3 point = CalculateShootPoint();
      
         var torque = Vector3.Cross(point * 0.5f, magnusForceMultiplier * direction);
         w = torque;
@@ -81,6 +80,17 @@ public class ShootingPhysics : MonoBehaviour
 
     }
 
+    public Vector3 CalculateShootPoint()
+    {
+        var direction = (target.position - initialPos).normalized;
+        var magnusForceMultiplier = _magnusSlider.value;
+        var side = Vector3.Dot(direction, Vector3.right) < 0 ? 1 : -1;
+        Vector3 point = new Vector3(side * Mathf.Sin(magnusForceMultiplier *  Mathf.PI/2),
+            0, -Mathf.Cos(magnusForceMultiplier * Mathf.PI/2));
+
+        return point;
+    }
+
     void Update()
     {
         if (!_shoot)
@@ -88,19 +98,9 @@ public class ShootingPhysics : MonoBehaviour
 
         timer += Time.deltaTime;
 
-        if (timer >= totalAnimationTime)
-        {
-            //ResetTimer();
-        }
-            
-
-        // finalPos.x = initialPos.x + initialVel.x * timer;
-        // finalPos.y = initialPos.y + initialVel.y * timer + (acceleration * timer * timer)/2;
-        // finalPos.z = initialPos.z + initialVel.z * timer;
 
         Vector3 magnusForce = 2.0f * (Vector3.Cross(w, eulerOldVel));
         
-        //Vector3 targetForce = (target.position - initialPos) * 10;
         eulerForces = magnusForce + upForce + Vector3.down * (0.5f * 9.81f);
         eulerAccel = eulerForces / 1.0f;
 
@@ -120,13 +120,5 @@ public class ShootingPhysics : MonoBehaviour
         ResetBall();
 
     }
-    private void OnDrawGizmos()
-    {
-        float step = 100 / totalAnimationTime;
-        for (int i = 0; i < 100; i++)
-        {
-            
-            //Gizmos.DrawSphere();
-        }
-    }
+ 
 }
