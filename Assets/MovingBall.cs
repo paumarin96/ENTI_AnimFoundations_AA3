@@ -69,7 +69,7 @@ public class MovingBall : MonoBehaviour
         if (!_shooted)
         {
             _myOctopus.NotifyShoot();
-            _shootingPhysics.Shoot(_force);
+            //_shootingPhysics.Shoot(_force);
             _shooted = true;
         }
 

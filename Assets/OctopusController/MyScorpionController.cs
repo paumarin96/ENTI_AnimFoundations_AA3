@@ -49,7 +49,7 @@ namespace OctopusController
         private Quaternion firstBoneInitialRot;
         public float[] Solution = null;
         private float StopThreshold = 0.1f;
-        private float LearningRate = 50f;
+        private float LearningRate = 75f;
         private float DeltaGradient = 0.2f;
 
         //LEGS

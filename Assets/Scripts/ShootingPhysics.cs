@@ -74,7 +74,7 @@ public class ShootingPhysics : MonoBehaviour
         upForce = Vector3.up * Mathf.Lerp(0.0f, 15.0f, magnusForceMultiplier);
 
         initialVel = target.position - initialPos;
-        eulerOldVel = initialVel * 0.5f * force;
+        eulerOldVel = initialVel * (0.5f * force);
 
         StartCoroutine(ResetTimer());
 
@@ -87,6 +87,9 @@ public class ShootingPhysics : MonoBehaviour
         var side = Vector3.Dot(direction, Vector3.right) < 0 ? 1 : -1;
         Vector3 point = new Vector3(side * Mathf.Sin(magnusForceMultiplier *  Mathf.PI/2),
             0, -Mathf.Cos(magnusForceMultiplier * Mathf.PI/2));
+
+
+        
 
         return point;
     }

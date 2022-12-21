@@ -973,6 +973,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _myOctopus: {fileID: 0}
+  tailBody: {fileID: 1494745760}
   animDuration: 5
   Body: {fileID: 8005202565346199705}
   StartPos: {fileID: 353675564}
@@ -5331,7 +5332,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amplitude: 2
   frequency: 3
-  shootingPhysics: {fileID: 0}
+  shootingPhysics: {fileID: 1938829486}
+  shootForce: {fileID: 1725396511}
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -6.5626526
+      outSlope: -6.5626526
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.21027717
+      value: -1.379976
+      inSlope: 0.06614831
+      outSlope: 0.06614831
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.6476825
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.5071202
+      value: 1
+      inSlope: 0.0055212015
+      outSlope: 0.0055212015
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.45284984
+      outWeight: 0.30461228
+    - serializedVersion: 3
+      time: 1
+      value: 0.007858157
+      inSlope: -2.0129488
+      outSlope: -2.0129488
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1539684499
 GameObject:
   m_ObjectHideFlags: 0
@@ -6561,11 +6605,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 21.28
+      value: 21.12
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -40.28
+      value: -39.6
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7032,7 +7076,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2176726463788365316, guid: c9ae8800298c5904a805978e2ff06201, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.44
+      value: 1.11
       objectReference: {fileID: 0}
     - target: {fileID: 5153248084575024097, guid: c9ae8800298c5904a805978e2ff06201, type: 3}
       propertyPath: m_LocalPosition.z

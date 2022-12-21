@@ -9,6 +9,8 @@ public class IK_Scorpion : MonoBehaviour
 
     public IK_tentacles _myOctopus;
 
+    public TailBodyTargetAnimation tailBody;
+
     [Header("Body")]
     float animTime;
     public float animDuration = 5;
@@ -70,11 +72,17 @@ public class IK_Scorpion : MonoBehaviour
         {
             Body.position = EndPos.position;
             animPlaying = false;
+            NotifyFinishedWalk();
         }
 
         _myController.UpdateIK();
     }
-    
+
+    private void NotifyFinishedWalk()
+    {
+        tailBody.StartAnimation();
+    }
+
     //Function to send the tail target transform to the dll
     public void NotifyTailTarget()
     {
