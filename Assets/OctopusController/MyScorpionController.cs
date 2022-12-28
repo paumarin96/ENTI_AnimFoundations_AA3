@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
+using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
 
@@ -88,10 +89,19 @@ namespace OctopusController
                 done.Add(false);
                 _legTooLongFlag.Add(false); 
                 _legTimers.Add(0);
-                _legOffsetCounter.Add(0);
+                _legOffsetCounter.Add(1);
 
             }
             
+            
+            for (var i = 0; i < _oldBasePositions.Length; i++)
+            {
+             
+                RaycastHit groundHit;
+                Physics.Raycast(legFutureBases[i].transform.position, Vector3.down, out groundHit, 10);
+
+                _oldBasePositions[i] = groundHit.point;   
+            }
             for (int i = 0; i < distances.Count; i++)
             {
                 for (int j = 0; j < distances[i].Length; j++)
@@ -168,53 +178,50 @@ namespace OctopusController
 
 
         #region private
+        //Lerp from unity modified to work with negative values
+ 
         //TODO: Implement the leg base animations and logic
+        private float timer = 0.f;
         private void updateLegPos()
         {
             //check for the distance to the futureBase, then if it's too far away start moving the leg towards the future base position
             //
             for (int i = 0; i < _legs.Length; i++)
             {
-               
-                if (Vector3.Distance(_legs[i].Bones[0].transform.position,
-                        legFutureBases[i].transform.position) > distanceThreshold && !_legTooLongFlag[i])
+
+                RaycastHit groundHit;
+                Physics.Raycast(legFutureBases[i].transform.position, Vector3.down, out groundHit, 10);
+                
+                float baseLegDistance = Vector3.Distance(_oldBasePositions[i], groundHit.point);
+
+                float midPointY = Vector3.Lerp(_oldBasePositions[i], groundHit.point, 0.5f).y + 0.15f;
+                
+                if (baseLegDistance >= 0.45f)
                 {
+                    timer += Time.deltaTime / {
+                    segundosQueDuraLaAnimacion}
+                    ;
+                    _legs[i].Bones[0].transform.position = Vector3.Lerp(_oldBasePositions[i], groundHit.point, timer);
+                   /* _legs[i].Bones[0].transform.position = new Vector3(_legs[i].Bones[0].transform.position.x,
+                        _legs[i].Bones[0].transform.position.y + (Mathf.Clamp(Mathf.Abs(Mathf.Sin(Time.time * Mathf.PI)),0,1) * 0.1f),
+                        _legs[i].Bones[0].transform.position.z);*/
+                   _legs[i].Bones[0].transform.position = new Vector3(_legs[i].Bones[0].transform.position.x,
+                       MathExtensions.Lerp(_legs[i].Bones[0].transform.position.y, midPointY, Time.deltaTime * _legOffsetCounter[i] * 30),
+                       _legs[i].Bones[0].transform.position.z);
 
-                    _legTimers[i] = 0;
-                    _legOffsetCounter[i]++;
-           
-                        _oldBasePositions[i] =  _legs[i].Bones[0].transform.position;
-                        _legTooLongFlag[i] = true;
-                    
-
-
-                }
-
-                if (_legTooLongFlag[i])
-                {
-                    _legTimers[i] += Time.deltaTime;
-
-                    float offset = 0;
-                    if (i == 0 || i == 3 || i == 4)
+                   if (_legOffsetCounter[i] == 1 && midPointY - _legs[i].Bones[0].transform.position.y < 0.1f)
+                   {
+                       _legOffsetCounter[i] = -1;
+                   }
+                    if (Vector3.Distance( _legs[i].Bones[0].transform.position, groundHit.point) < 0.1f)
                     {
-                        offset = _legOffsetCounter[i] % 2 == 0 ? 0.25f : -0.25f;
-                    }
-                    else
-                    {
-                        offset = _legOffsetCounter[i] % 2 == 0 ? -0.25f : 0.25f;
-                    }
-                    
-                    
-                   
-                    _legs[i].Bones[0].transform.position = Vector3.Lerp(_oldBasePositions[i],
-                        legFutureBases[i].transform.position + new Vector3(0,0, offset), _legTimers[i] / _legAnimDuration);
-                    
-                    if (_legTimers[i] >= _legAnimDuration)
-                    {
-                        _legTooLongFlag[i] = false;
+                        _oldBasePositions[i] = groundHit.point;
+                        _legOffsetCounter[i] = 1;
+
                     }
                 }
-            
+                
+                
 
             }
             
