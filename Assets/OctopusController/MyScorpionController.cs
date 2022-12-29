@@ -62,7 +62,9 @@ namespace OctopusController
         private List<float> _legTimers = new List<float>();
         private List<int> _legOffsetCounter = new List<int>();
 
-        private float _legAnimDuration = 0.7f;
+        private float _legAnimDuration = 0.1f;
+
+        private bool pairMoving = false;
         
         
         private float distanceThreshold = 0.4f;
@@ -90,6 +92,7 @@ namespace OctopusController
                 _legTooLongFlag.Add(false); 
                 _legTimers.Add(0);
                 _legOffsetCounter.Add(1);
+                
 
             }
             
@@ -181,13 +184,13 @@ namespace OctopusController
         //Lerp from unity modified to work with negative values
  
         //TODO: Implement the leg base animations and logic
-        private float timer = 0.f;
         private void updateLegPos()
         {
             //check for the distance to the futureBase, then if it's too far away start moving the leg towards the future base position
-            //
             for (int i = 0; i < _legs.Length; i++)
             {
+
+                bool isPair = i == 3 || i == 4 || i == 0;
 
                 RaycastHit groundHit;
                 Physics.Raycast(legFutureBases[i].transform.position, Vector3.down, out groundHit, 10);
@@ -198,27 +201,33 @@ namespace OctopusController
                 
                 if (baseLegDistance >= 0.45f)
                 {
-                    timer += Time.deltaTime / {
-                    segundosQueDuraLaAnimacion}
-                    ;
-                    _legs[i].Bones[0].transform.position = Vector3.Lerp(_oldBasePositions[i], groundHit.point, timer);
-                   /* _legs[i].Bones[0].transform.position = new Vector3(_legs[i].Bones[0].transform.position.x,
-                        _legs[i].Bones[0].transform.position.y + (Mathf.Clamp(Mathf.Abs(Mathf.Sin(Time.time * Mathf.PI)),0,1) * 0.1f),
-                        _legs[i].Bones[0].transform.position.z);*/
-                   _legs[i].Bones[0].transform.position = new Vector3(_legs[i].Bones[0].transform.position.x,
-                       MathExtensions.Lerp(_legs[i].Bones[0].transform.position.y, midPointY, Time.deltaTime * _legOffsetCounter[i] * 30),
-                       _legs[i].Bones[0].transform.position.z);
+                    if (isPair && !pairMoving)
+                    {
+                        pairMoving = true;
+                    }
 
-                   if (_legOffsetCounter[i] == 1 && midPointY - _legs[i].Bones[0].transform.position.y < 0.1f)
-                   {
-                       _legOffsetCounter[i] = -1;
-                   }
-                    if (Vector3.Distance( _legs[i].Bones[0].transform.position, groundHit.point) < 0.1f)
+                    if (!isPair && pairMoving)
+                        continue;
+                    
+                    _legTimers[i] += Time.deltaTime;
+
+                    _legTimers[i] = Mathf.Clamp( _legTimers[i], 0, _legAnimDuration);
+                    
+                    _legs[i].Bones[0].transform.position = Vector3.Lerp(_oldBasePositions[i], groundHit.point,  _legTimers[i] / _legAnimDuration);
+                    _legs[i].Bones[0].transform.position = new Vector3(_legs[i].Bones[0].transform.position.x,
+                        groundHit.point.y + Mathf.Sin(_legTimers[i] / _legAnimDuration * Mathf.PI) * 0.2f,
+                        _legs[i].Bones[0].transform.position.z);
+                    
+
+                    if ( _legTimers[i] >= _legAnimDuration)
                     {
                         _oldBasePositions[i] = groundHit.point;
-                        _legOffsetCounter[i] = 1;
+                        _legTimers[i] = 0.0f;
+                        if (isPair)
+                            pairMoving = false;
 
                     }
+                    
                 }
                 
                 
@@ -227,6 +236,15 @@ namespace OctopusController
             
         }
 
+        public void DrawGizmos()
+        {
+            for (var i = 0; i < _oldBasePositions.Length; i++)
+            {
+                Gizmos.DrawSphere(_oldBasePositions[i], 0.1f);
+            }
+
+        }
+        
         private void updateTail()
         {
             ErrorFunction = DistanceFromTarget;

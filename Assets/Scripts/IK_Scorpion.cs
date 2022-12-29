@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using OctopusController;
 using UnityEngine;
@@ -32,6 +33,8 @@ public class IK_Scorpion : MonoBehaviour
 
     public delegate void StartWalk();
 
+    public bool isPlayerControlling;
+
     public event StartWalk OnStartWalk;
     
     // Start is called before the first frame update
@@ -64,7 +67,7 @@ public class IK_Scorpion : MonoBehaviour
             animPlaying = true;
         }
         
-        if (animTime < animDuration)
+        if (animTime < animDuration && !isPlayerControlling)
         {
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
         }
@@ -95,5 +98,10 @@ public class IK_Scorpion : MonoBehaviour
         if(OnStartWalk != null)
             OnStartWalk();
         _myController.NotifyStartWalk();
+    }
+
+    private void OnDrawGizmos()
+    {
+        _myController.DrawGizmos();
     }
 }
