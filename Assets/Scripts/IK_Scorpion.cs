@@ -30,6 +30,8 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] futureLegBases;
 
     public ShootForce shootForce;
+    readonly float bodyHeightSpeed = 20f;
+    private float bodyYOffset = 0f;
 
     public delegate void StartWalk();
 
@@ -43,6 +45,15 @@ public class IK_Scorpion : MonoBehaviour
         _myController.InitLegs(legs,futureLegBases,legTargets);
         _myController.InitTail(tail);
 
+        float y = 0;
+        for (int i = 0; i < legs.Length; i++)
+        {
+            y += legs[i].GetChild(0).position.y;
+        }
+
+        y /= legs.Length;
+
+        bodyYOffset = Body.position.y - y; 
     }
 
     // Update is called once per frame
@@ -79,8 +90,47 @@ public class IK_Scorpion : MonoBehaviour
         }
 
         _myController.UpdateIK();
+        UpdateBodyPosition();
+        UpdateBodyRotation();
     }
 
+    
+    //Updates the body position depending on the height of the legs
+    private void UpdateBodyPosition()
+    {
+        
+        float y = 0;
+        for (int i = 0; i < futureLegBases.Length; i++)
+        {
+            RaycastHit groundHit;
+            Physics.Raycast(futureLegBases[i].transform.position, Vector3.down, out groundHit, 10);
+            y += groundHit.point.y;
+        }
+
+        y /= legs.Length;
+
+        //Body.position = new Vector3(Body.position.x, bodyYOffset + y, Body.position.z); 
+       Body.position  = Vector3.Lerp(Body.position, new Vector3(Body.position.x, bodyYOffset + y, Body.position.z),
+            Time.deltaTime * 30);
+    }
+
+    private void UpdateBodyRotation()
+    {
+       
+        Vector3 legAvgNormal1 = Vector3.Cross( legs[0].GetChild(0).transform.position - legs[3].GetChild(0).transform.position,
+            legs[4].GetChild(0).transform.position - legs[3].GetChild(0).transform.position).normalized;
+
+        Vector3 legAvgNormal2 = Vector3.Cross(legs[5].GetChild(0).transform.position - legs[2].GetChild(0).transform.position,
+            legs[1].GetChild(0).transform.position - legs[2].GetChild(0).transform.position).normalized;
+
+        Vector3 avgNormal = (legAvgNormal1 + legAvgNormal2) / 2;
+        avgNormal.Normalize();
+        
+        Body.up = Vector3.Lerp(Body.up,avgNormal, Time.deltaTime * 10);
+
+    }
+    
+    
     private void NotifyFinishedWalk()
     {
         tailBody.StartAnimation();
