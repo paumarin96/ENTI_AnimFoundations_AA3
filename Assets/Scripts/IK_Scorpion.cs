@@ -17,6 +17,7 @@ public class IK_Scorpion : MonoBehaviour
     public float animDuration = 5;
     bool animPlaying = false;
     public Transform Body;
+    private Rigidbody bodyRigidbody;
     public Transform StartPos;
     public Transform EndPos;
 
@@ -44,6 +45,7 @@ public class IK_Scorpion : MonoBehaviour
     {
         _myController.InitLegs(legs,futureLegBases,legTargets);
         _myController.InitTail(tail);
+        bodyRigidbody = Body.GetComponent<Rigidbody>();
 
         float y = 0;
         for (int i = 0; i < legs.Length; i++)
@@ -59,11 +61,22 @@ public class IK_Scorpion : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+
+        if (isPlayerControlling)
+        {
+            NotifyTailTarget();
+            _myController.UpdateIK();
+            UpdateBodyPosition();
+            return;
+        }
         if(animPlaying)
             animTime += Time.deltaTime;
 
         NotifyTailTarget();
-        
+        _myController.UpdateIK();
+        UpdateBodyPosition();
+        GetBodyRotation(Vector3.forward);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             shootForce.StartForceSlider();
@@ -78,7 +91,7 @@ public class IK_Scorpion : MonoBehaviour
             animPlaying = true;
         }
         
-        if (animTime < animDuration && !isPlayerControlling)
+        if (animTime < animDuration)
         {
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
         }
@@ -89,9 +102,7 @@ public class IK_Scorpion : MonoBehaviour
             NotifyFinishedWalk();
         }
 
-        _myController.UpdateIK();
-        UpdateBodyPosition();
-        UpdateBodyRotation();
+
     }
 
     
@@ -110,11 +121,11 @@ public class IK_Scorpion : MonoBehaviour
         y /= legs.Length;
 
         //Body.position = new Vector3(Body.position.x, bodyYOffset + y, Body.position.z); 
-       Body.position  = Vector3.Lerp(Body.position, new Vector3(Body.position.x, bodyYOffset + y, Body.position.z),
-            Time.deltaTime * 30);
+       bodyRigidbody.MovePosition(Vector3.Lerp(Body.position, new Vector3(Body.position.x, bodyYOffset + y, Body.position.z),
+           Time.deltaTime * 30));
     }
 
-    private void UpdateBodyRotation()
+    public Quaternion GetBodyRotation(Vector3 forward)
     {
        
         Vector3 legAvgNormal1 = Vector3.Cross( legs[0].GetChild(0).transform.position - legs[3].GetChild(0).transform.position,
@@ -125,9 +136,19 @@ public class IK_Scorpion : MonoBehaviour
 
         Vector3 avgNormal = (legAvgNormal1 + legAvgNormal2) / 2;
         avgNormal.Normalize();
-        
-        Body.up = Vector3.Lerp(Body.up,avgNormal, Time.deltaTime * 10);
 
+        Vector3 right = Vector3.Cross(forward, avgNormal).normalized;
+        Vector3 realForward = Vector3.Cross(avgNormal, right).normalized;
+
+       return Quaternion.LookRotation(realForward, avgNormal);
+        
+        //Body.up = Vector3.Lerp(Body.up,avgNormal, Time.deltaTime * 10);
+        
+    }
+
+    public void SetLearningRate(float newLearningRate)
+    {
+        _myController.SetLearningRate(newLearningRate);
     }
     
     
@@ -148,6 +169,7 @@ public class IK_Scorpion : MonoBehaviour
         if(OnStartWalk != null)
             OnStartWalk();
         _myController.NotifyStartWalk();
+        SetLearningRate(75);
     }
 
     private void OnDrawGizmos()

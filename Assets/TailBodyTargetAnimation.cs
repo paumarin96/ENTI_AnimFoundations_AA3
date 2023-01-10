@@ -14,6 +14,7 @@ public class TailBodyTargetAnimation : MonoBehaviour
     private Vector3 initialLocalPosition;
 
     public ShootingPhysics shootingPhysics;
+    public IK_Scorpion scorpion;
     private Transform parent;
     public ShootForce shootForce;
     private float shootForceRemaped;
@@ -33,47 +34,25 @@ public class TailBodyTargetAnimation : MonoBehaviour
 
     public void StartAnimation()
     {
+        scorpion.SetLearningRate(shootForce.slider.value.Remap(0,100,25, 200));
         initialPosition = transform.position;
-        initialLocalPosition = transform.localPosition;
-        parent = transform.parent;
-        transform.SetParent(null);
-        _shootPoint = shootingPhysics.transform.position + shootingPhysics.CalculateShootPoint();
-        shootForceRemaped = shootForce.slider.value.Remap(0, 100, 0.3f, 1);
+        transform.position = shootingPhysics.transform.position + shootingPhysics.CalculateShootPoint();
         animationRunning = true;
+        StartCoroutine("ReturnToNormal");
     }
-    // Update is called once per frame
-    
-    //Lerp from unity modified to work with negative values
-    public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+
+    private IEnumerator ReturnToNormal()
     {
-        return new Vector3(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
-        
+        yield return new WaitForSeconds(2);
+        transform.position = initialPosition;
+        animationRunning = false;
     }
+    
+
     void Update()
     {
         var maxTime = 0.5f * shootForceRemaped;
-        if (animationRunning)
-        {
-            timer += Time.deltaTime * maxTime;
-            
-            var curveTime = animationCurve.Evaluate(timer);
- 
-            transform.position = Lerp(initialPosition, _shootPoint, curveTime);
-            transform.position = new Vector3(transform.position.x, _shootPoint.y, transform.position.z);
-            
-            if(curveTime >= 0.9f)
-                shootingPhysics.Shoot(shootForce.slider.value);
-            
-            if (timer >= 1.0f)
-            {
-                timer = 0.0f;
-                animationRunning = false;
-                transform.position = Vector3.zero;
-                transform.SetParent(parent);
-                transform.localPosition = initialLocalPosition;
-                return;
-            }
-        }
+  
     
 
         if (animationRunning)

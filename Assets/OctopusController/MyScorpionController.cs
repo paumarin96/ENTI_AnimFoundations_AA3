@@ -49,7 +49,7 @@ namespace OctopusController
         private Vector3[] StartOffset = null;
         private Quaternion firstBoneInitialRot;
         public float[] Solution = null;
-        private float StopThreshold = 0.1f;
+        private float StopThreshold = 0.05f;
         private float LearningRate = 75f;
         private float DeltaGradient = 0.2f;
 
@@ -157,6 +157,11 @@ namespace OctopusController
              
         }
 
+        public void SetLearningRate(float learningRate)
+        {
+            LearningRate = learningRate;
+        }
+        
         //TODO: Check when to start the animation towards target and implement Gradient Descent method to move the joints.
         public void NotifyTailTarget(Transform target)
         {
