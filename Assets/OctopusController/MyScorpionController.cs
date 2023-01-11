@@ -243,10 +243,14 @@ namespace OctopusController
 
         public void DrawGizmos()
         {
-            for (var i = 0; i < _oldBasePositions.Length; i++)
+            if (Application.isPlaying)
             {
-                Gizmos.DrawSphere(_oldBasePositions[i], 0.1f);
+                for (var i = 0; i < _oldBasePositions.Length; i++)
+                {
+                    Gizmos.DrawSphere(_oldBasePositions[i], 0.1f);
+                }
             }
+        
 
         }
         

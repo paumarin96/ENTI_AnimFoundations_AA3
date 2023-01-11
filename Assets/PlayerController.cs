@@ -37,9 +37,14 @@ public class PlayerController : MonoBehaviour
             gameCamera.SetActive(true);
             Cursor.lockState = CursorLockMode.None;
         }
+
+        Vector3 inputs = Vector3.zero;
+        if (_scorpion.isPlayerControlling)
+        {
+          inputs  = new Vector3(Input.GetAxis("Horizontal"), 0,Input.GetAxis("Vertical"));
+        }
         
-        
-        Vector3 inputs = new Vector3(Input.GetAxis("Horizontal"), 0,Input.GetAxis("Vertical"));
+
 
         Vector3 camDirection = -new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z);
 
