@@ -368,7 +368,7 @@ namespace OctopusController
 
             var dot = Vector3.Dot(tailForward, targetNormal);
             
-            return 0.5f*Vector3.Distance(point, target) + 0.5f*Mathf.Acos(dot);
+            return 0.5f*Vector3.Distance(point, target) + 0.5f*Mathf.Abs(1+dot);
         }
         
         public PositionRotation ForwardKinematics(float[] Solution)
