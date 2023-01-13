@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
-using UnityEditor;
-using UnityEditor.PackageManager;
+
+
 using UnityEngine;
 
 
@@ -366,9 +366,9 @@ namespace OctopusController
         {
             Vector3 point = ForwardKinematics(Solution);
 
-            var dot = Vector3.Dot(tailForward, targetNormal);
-            
-            return 0.5f*Vector3.Distance(point, target) + 0.5f*Mathf.Abs(1+dot);
+           // var dot = Vector3.Dot(tailForward, targetNormal);
+
+            return Vector3.Distance(point, target);
         }
         
         public PositionRotation ForwardKinematics(float[] Solution)
