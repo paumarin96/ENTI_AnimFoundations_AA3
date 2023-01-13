@@ -53,7 +53,7 @@ public class TailBodyTargetAnimation : MonoBehaviour
     {
         var maxTime = 0.5f * shootForceRemaped;
   
-    
+  
 
         if (animationRunning)
             return;

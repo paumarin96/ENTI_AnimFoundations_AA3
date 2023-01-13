@@ -40,6 +40,8 @@ namespace OctopusController
         
         //TAIL
         Transform tailTarget;
+        public Vector3 tailForward;
+        public Vector3 targetNormal;
         Transform tailEndEffector;
         MyTentacleController _tail;
         float animationRange;
@@ -155,6 +157,11 @@ namespace OctopusController
                
             }
              
+        }
+
+        public void SetTargetNormal(Vector3 normal)
+        {
+            targetNormal = normal;
         }
 
         public void SetLearningRate(float learningRate)
@@ -358,8 +365,10 @@ namespace OctopusController
         public float DistanceFromTarget(Vector3 target, float[] Solution)
         {
             Vector3 point = ForwardKinematics(Solution);
+
+            var dot = Vector3.Dot(tailForward, targetNormal);
             
-            return Vector3.Distance(point, target);
+            return 0.5f*Vector3.Distance(point, target) + 0.5f*Mathf.Acos(dot);
         }
         
         public PositionRotation ForwardKinematics(float[] Solution)

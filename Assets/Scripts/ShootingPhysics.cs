@@ -133,6 +133,8 @@ public class ShootingPhysics : MonoBehaviour
 
         Vector3 gravity = Vector3.down * (0.5f * 9.81f);
         Vector3 magnusForce = 2.0f * (Vector3.Cross(w, eulerOldVel));
+        
+        Scorpion.SetTargetNormal(((ball.position + CalculateShootPoint()) - ball.position).normalized);
 
         if (Input.GetKeyDown(KeyCode.I))
         {
@@ -172,11 +174,10 @@ public class ShootingPhysics : MonoBehaviour
         forcesArrows[0].transform.forward = gravity;
         //Magnus force
         forcesArrows[1].transform.forward = magnusForce;
-        //Upforce
-        forcesArrows[2].transform.forward = upForce;
+  
 
-        
-        
+
+
         Vector3 eulerVel = eulerOldVel + eulerAccel * 0.01f;
         finalPos = ball.position + eulerVel * 0.01f;
 

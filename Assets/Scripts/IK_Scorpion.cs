@@ -24,6 +24,7 @@ public class IK_Scorpion : MonoBehaviour
     [Header("Tail")]
     public Transform tailTarget;
     public Transform tail;
+    public Transform tailEnd;
 
     [Header("Legs")]
     public Transform[] legs;
@@ -63,6 +64,7 @@ public class IK_Scorpion : MonoBehaviour
     {
 
 
+        _myController.tailForward = tailEnd.up;
         if (isPlayerControlling)
         {
             NotifyTailTarget();
@@ -150,7 +152,11 @@ public class IK_Scorpion : MonoBehaviour
     {
         _myController.SetLearningRate(newLearningRate);
     }
-    
+
+    public void SetTargetNormal(Vector3 normal)
+    {
+        _myController.SetTargetNormal(normal);
+    }
     
     private void NotifyFinishedWalk()
     {
